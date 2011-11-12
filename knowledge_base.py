@@ -132,6 +132,13 @@ class Knowledge(object):
                 self.impossibilities[i] = False
             self.happiness[i] = 1.0 - abs(((rack[i]/kCardCount) - ((i+1)/kRackSize)))
 
+    def update_impossibilites_and_happiness_at_idx(self, idx):
+        if (kCardCount - self.rack[idx] < kRackSize - idx or idx + 1 > self.rack[idx]):
+            self.impossibilities[idx] = True
+        else:
+            self.impossibilities[idx] = False
+        self.happiness[idx] = 1.0 - abs(((rack[idx]/kCardCount) - ((idx+1)/kRackSize)))
+        
     def rackContains(self, rack, val):
         idx = rack.index(val)
         return (idx != -1) and not self.impossibilities[idx]
