@@ -225,6 +225,47 @@ class Knowledge(object):
 
         return importantCards
 
+
+    def getIndicesInSortedArr(self, card):
+        for i in range(len(self.rack)):
+            if card < self.rack[i]:
+                return (i-1, i)
+
+        return (19, 19)
+
+    def pickLocationInSortedArr(self, card):
+        idxs = self.getIndicesInSortedArr(card)
+        if idxs[0] == -1:
+            return 0
+
+        if self.countTheoreticalRunSize(card, idxs[0]) > self.countTheoreticalRunSize(card, idxs[1]):
+            return idxs[0]
+        else:
+            return idxs[1]
+
+
+    def countTheoreticalRunSize(self, card, idx):
+
+        rack = self.rack
+        count = 1
+        lastVal = card
+
+        for i in range(idx + 1, len(self.rack)):
+            if rack[i] is lastVal + 1:
+                count += 1
+                lastVal = rack[i]
+            else:
+                break
+        lastVal = card
+        for i in range(idx -1, -1, -1):
+            if rack[i] is lastVal - 1:
+                count += 1
+                lastVal = rack[i]
+            else:
+                break
+
+        return count
+
     ## returns the probabilty of drawing a card from the deck
     def probabilityToDraw(self, card):
         if (card in self.discard_pile and card != peak_discard()):

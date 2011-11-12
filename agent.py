@@ -3,6 +3,9 @@ import knowledge_base
 import algorithms
 import math
 
+import logging
+from logging import debug, info, warning, error, exception, critical
+
 class Agent(object):
 
     def __init__(self, knowledgeBase):
@@ -53,6 +56,10 @@ class orderingAgent(Agent):
         good_cards = self.knowledge.getNumsAdjacentToRuns()
         top_card = self.knowledge.peek_discard()
         if top_card in good_cards:
+            return False
+        elif(self.knowledge.happiness[self.knowledge.getIdealSlot(top_card)] <
+             algorithms.getHappiness(top_card, self.knowledge.getIdealSlot(top_card)) or
+             self.knowledge.impossibilities[self.knowledge.getIdealSlot(top_card)]):
             return False
         else:
             return True
