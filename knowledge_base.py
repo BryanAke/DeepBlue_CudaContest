@@ -7,6 +7,8 @@ import pickle
 import os
 import math
 
+import algorithms
+
 ## constants
 kCardCount = 80
 kRackSize = 20
@@ -14,8 +16,8 @@ kRackSize = 20
 #thresholds
 kVeryUnhappy = .4
 kUnhappy = .6
-kOk = .8
-kHappy = .9
+kOk = .78
+kHappy = .85
 kVeryHappy = 1.0
 
 ## the knowledge base which contains all of the knowledge
@@ -29,10 +31,13 @@ class Knowledge(object):
         self.deck = set(xrange(1,kCardCount + 1))
         self.deck_size = kCardCount - 2 * kRackSize - 1
 
+        self.runs = []
+
         self.game_id = args['game_id']
         self.player_id = args['player_id']
         self.other_player_id = args['other_player_id']
         self.other_rack = [None] * kRackSize
+        self.other_other_cards = []
 
         self.orig_discard = args['initial_discard']
         self.rack = self.orig_rack = []
@@ -61,6 +66,7 @@ class Knowledge(object):
     def set_initial_rack(self, rack):
         self.rack = self.orig_rack = rack
         self.deck.difference_update(rack)
+        self.update_runs()
 
     def their_move(self, move, discard):
         if move['move'] == 'take_discard':
@@ -96,6 +102,7 @@ class Knowledge(object):
             self.rack[idx] = card
 
         self.update_impossibilites_and_happiness_at_idx(idx)
+        self.update_runs()
 
     def final(self, us, them, reason):
         self.our_score = us
@@ -117,7 +124,7 @@ class Knowledge(object):
             else:
                 self.impossibilities[i] = False
             self.happiness[i] = 1.0 - abs(((rack[i]/kCardCount) - ((i+1)/kRackSize)))
-            
+
     def getIdealSlot(self, card):
         return int(math.ceil((card/80.0) * 20) -1)
 
@@ -140,53 +147,107 @@ class Knowledge(object):
         ret = []
         run = []
         for i in rack:
-            if not run or i is run[-1]:
+            if not run or i == run[-1] + 1:
                 run.append(i)
             else:
                 ret.append(tuple(run))
                 run = [i]
         return [i for i in ret if len(i) > 1]
 
+    def checkDiscard(self, num):
+        for elem in self.discard_pile:
+            if num is elem:
+                return True
+        for elem in self.other_rack:
+            if num is elem:
+                return True
+        return False
+
+    #find out whether 5 card run is possible to create
+    def getRunCompletion(self, run):
+        ascend = range(min(run[1]+1,80),min(run[0]+5,80))[:len(self.rack)-run[3]]
+        decend = range(max(run[0]-1,1),max(run[1]-5,1),-1)[:run[2]]
+        a = run[3]-run[2]
+        d = run[3]-run[2]
+        for num in ascend:
+            if self.checkDiscard(num):
+                break
+            else:
+                a += 1
+        for num in decend:
+            if self.checkDiscard(num):
+                break
+            else:
+                d += 1
+        if a < 5 and d < 5:
+            a,d = 0,0
+        res = (a,d)
+        return res
+
+    def update_runs(self):
+        self.runs = []
+        start = 0
+        stop = 1
+        for i in xrange(1,len(self.rack)):
+            if self.rack[i] == self.rack[i-1]+1:
+                stop = i+1
+            else:
+                if start != stop:
+                    self.runs.append((self.rack[start], self.rack[stop-1], start, stop))
+                start = i
+                stop = i + 1
+        if start != stop:
+            self.runs.append((self.rack[start], self.rack[stop-1], start, stop))
+
+        def run_weight(r):
+            w = (r[3]-r[2]) * algorithms.getHappiness((r[0]+r[1])/2, (r[2]+r[3]-1)/2)
+            w *= sum(self.getRunCompletion(r))
+            return w
+
+        self.runs.sort(key=run_weight, reverse=True)
+
+        # When runs are out-of-order
+
+        while self.runs and run_weight(self.runs[-1]) == 0:
+            self.runs.pop()
+
     def getNumsAdjacentToRuns(self):
-        runs = self.rackContainsRuns(self.rack)
         importantCards = set()
-        for run in runs:
-            if rack.index(run[0]):
-                importantCards.add(run[0] - 1)
-            if rack.index(run[-1]) != len(rack) -1:
-                importantCards.add(run[-1] + 1)
+        for run in self.runs:
+            importantCards.add(run[0]-1)
+            importantCards.add(run[1]+1)
 
         #possible edge cases
         importantCards.discard(0)
         importantCards.discard(81)
 
         return importantCards
-    
+
 
     def getIndicesInSortedArr(self, card):
         for i in range(len(self.rack)):
             if card < self.rack[i]:
                 return (i-1, i)
-            
+
         return (19, 19)
-    
+
     def pickLocationInSortedArr(self, card):
         idxs = self.getIndicesInSortedArr(card)
         if idxs[0] == -1:
             return 0
-    
+
         if self.countTheoreticalRunSize(card, idxs[0]) > self.countTheoreticalRunSize(card, idxs[1]):
             return idxs[0]
         else:
             return idxs[1]
-        
-    
+
+
     def countTheoreticalRunSize(self, card, idx):
-        
+
         rack = self.rack
         count = 1
         lastVal = card
-        
+
         for i in range(idx + 1, len(self.rack)):
             if rack[i] is lastVal + 1:
                 count += 1
@@ -200,21 +261,31 @@ class Knowledge(object):
                 lastVal = rack[i]
             else:
                 break
-        
+
         return count
-    
+
     ## returns the probabilty of drawing a card from the deck
     def probabilityToDraw(self, card):
         if (card in self.discard_pile and card != peak_discard()):
             return 0.0
-        removedCards = kCardCount - kRackSize - len(self.discard_pile) 
-        return 1/removedCards  
+        removedCards = kCardCount - kRackSize - len(self.discard_pile)
+        return 1/removedCards
     
     def isInRun(self, card):
         for run in self.runs:
             if(run[0] <= card <= run[1]):
                 return True
         return False
+    
+    def speculateSorted(self, card):
+        sortedness = algorithms.adjacent_inversions(self.rack)
+        sorted_idx = -1
+        for idx in range(len(self.rack)):
+            s = algorithms.adjacent_inversions(self.rack, idx, card)
+            if s < sortedness:
+                sortedness = s
+                sorted_idx = idx
+        return sorted_idx
 
     def pickle(self):
         fileName = os.path.join("pickledKnowledge", str(self.game_id) + "_" + str(self.other_player_id) + ".pickle")
@@ -236,6 +307,6 @@ class Knowledge(object):
 #    print "Happiness: " + str(kb.happiness)
 #    print "Impossibilities: " + str(kb.impossibilities)
 #    print "Probability to pull a 5: " + str(kb.probabilityToDraw(5))
-# 
+#
 #if __name__ == '__main__':
 #    test_main()

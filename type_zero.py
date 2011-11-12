@@ -29,7 +29,7 @@ BaseHTTPServer.BaseHTTPRequestHandler.address_string = _bare_address_string
 
 # End hack.
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 
 def trycatch(f):
     @functools.wraps(f)
@@ -55,6 +55,7 @@ class RackO(object):
 
         self.k = knowledge_base.Knowledge(args)
         self.a = agent.orderingAgent(self.k)
+        ##self.a = agent.Agent(self.k)
 
         info("Starting game %d going %s against team %d.", args['game_id'], ("first", "second")[args['player_id']], args['other_player_id'])
 
