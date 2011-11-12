@@ -39,7 +39,7 @@ class Knowledge(object):
             if not run or i is run[-1] :
                 run.append(i)
             else:
-                ret.append(run)
+                ret.append(tuple(run))
                 run = [i]
         return [i for i in ret if len(i) > 1]
     
