@@ -85,7 +85,7 @@ class Knowledge(object):
 
     def our_move(self, move, drew, idx, card):
         if move == 'next_player_turn':
-        	self.moves.append([True, drew, idx, card])
+            self.moves.append([True, drew, idx, card])
             debug("We moved successfully")
             if drew:
                 self.draw()
@@ -95,7 +95,7 @@ class Knowledge(object):
             self.push_discard(self.rack[idx])
             self.rack[idx] = card
         elif move == 'move_ended_game':
-        	self.moves.append([True, drew, idx, card])
+            self.moves.append([True, drew, idx, card])
             debug("The game is over: %s", args['reason'])
             if drew:
                 self.draw()
@@ -151,8 +151,8 @@ class Knowledge(object):
                 run = [i]
         return [i for i in ret if len(i) > 1]
 
-    def getNumsAdjacentToRuns(self, rack):
-        runs = self.rackContainsRuns(rack)
+    def getNumsAdjacentToRuns(self):
+        runs = self.rackContainsRuns(self.rack)
         importantCards = set()
         for run in runs:
             importantCards.add(run[0] - 1)
