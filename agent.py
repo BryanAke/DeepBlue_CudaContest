@@ -47,14 +47,39 @@ class Agent(object):
     
 class orderingAgent(Agent):
     def shouldDraw(self):
-        return False
+        #if(algorithms.adjacent_inversions(rack) == 0):
+            #group cards.
+        good_cards = self.knowledge.getNumsAdjacentToRuns()
+        top_card = self.knowledge.discard_pile[-1]
+        if top_card in good_cards:
+            return False
+        else:
+            return True
+        #else:
+        #    return False
     
     def place_card(self, card):
         #info(card/80.0, int(card/80.0 * 20))
-        return int((card/80.0) * 20)
+        rack = self.knowledge.rack
+        if(algorithms.adjacent_inversions(rack) == 0):
+            #group cards.
+            runs = [i for i in [j for j in  self.knowledge.rackContainsRuns()]]
+            for i in range(0, len(rack)):
+                if rack[i] > card:
+                    break;
+                
+            if rack[i] in runs:
+                #beginning of a run
+                return i - 1
+            elif rack[i - 1] in runs:
+                return i
+            else:
+                return int((card/80.0) * 20)
+            
+        else:
+            return int((card/80.0) * 20)
         #highest_wgo = 0
         #highest_idx = 0
-        #rack = self.knowledge.rack
         #for i in range(0, len(rack)):
         #    if rack[i] > highest_wgo and rack[i] < card and self.knowledge.happiness[i] > .8:
         #        highest_wgo = rack[i]
