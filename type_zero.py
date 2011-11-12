@@ -18,6 +18,7 @@ root.addHandler(logging.FileHandler("type_zero.log"))
 
 class RackO(object):
 	def ping(self, p):
+		debug("ping(%s)", repr(p))
 		try:
 			return "pong"
 		except Exception:
@@ -35,6 +36,7 @@ class RackO(object):
 		return card
 
 	def start_game(self, args):
+		debug("start_game(%s)", repr(args))
 		try:
 			self.game_id = args['game_id']
 			self.player_id = args['player_id']
@@ -57,6 +59,7 @@ class RackO(object):
 			raise
 
 	def get_move(self, args):
+		debug("get_move(%s)", repr(args))
 		try:
 			if args['game_id'] != self.game_id:
 				error("Got a request for a move in non-active game.")
@@ -90,7 +93,7 @@ class RackO(object):
 				else:
 					error("The other player did something unknown!")
 
-			self._push_discard(args['discard'])
+				self._push_discard(args['discard'])
 
 			our_move = { }
 
@@ -103,6 +106,7 @@ class RackO(object):
 			raise
 
 	def get_deck_exchange(self, args):
+		debug("get_deck_exchange(%s)", repr(args))
 		try:
 			if args['game_id'] != self.game_id:
 				error("Got a request for a move in non-active game.")
@@ -125,12 +129,13 @@ class RackO(object):
 			raise
 
 	def move_result(self, args):
+		debug("move_result(%s)", repr(args))
 		try:
 			if args['game_id'] != self.game_id:
 				error("Got a request for a move in non-active game.")
 
 			move = args['move']
-			if move == 'next_player_move':
+			if move == 'next_player_turn':
 				info("We moved successfully")
 				self._push_discard(self.rack[self.idx])
 				self.rack[self.idx] = self.card
@@ -138,6 +143,8 @@ class RackO(object):
 				info("The game is over: %s", args['reason'])
 			elif move == 'illegal':
 				info("We made an illegal move: %s", args['reason'])
+			else:
+				error("We did something unexpected.")
 
 			return ""
 		except Exception:
@@ -145,6 +152,7 @@ class RackO(object):
 			raise
 
 	def game_result(self, args):
+		debug("game_result(%s)", repr(args))
 		try:
 			if args['game_id'] != self.game_id:
 				error("Got a request for a move in non-active game.")
