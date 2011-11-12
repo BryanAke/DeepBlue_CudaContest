@@ -18,13 +18,21 @@ class Agent(object):
                 return True
             ## greedily find ordered index (least)
             orderedIndex = algorithms.closestValidFit(topCard, self.knowledge.rack)
-            ## check happiness at that index
-            happy = algorithms.getHappiness(topCard, orderedIndex)
-            ## check if happy is greater than threshhold
-            if(happy > knowledge_base.kOk and happy > self.knowledge.happiness[orderedIndex]):
-                return False
+            utility = -1
+            if(algorithms.normal_or_relative(self.knowledge.rack) == 0):
+                ## check happiness at that index
+                utility = algorithms.getHappiness(topCard, orderedIndex)
+                ## check if happy is greater than threshhold
+                if(utility > knowledge_base.kHappy and utility > self.knowledge.happiness[orderedIndex]):
+                    return False
+                else:
+                    return True
             else:
-                return True
+                utility = algorithms.getScore(self.knowledge.rack) - algorithms.getOrderedScore(self.knowledge.rack, topCard)
+                if(utility > 0):
+                    return False
+                else:
+                    return True
         else:
             return True
 

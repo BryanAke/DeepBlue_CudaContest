@@ -59,7 +59,7 @@ def closestValidFit(card,rack):
 		return (i-1)
 	return 0
 
-def getScore(rack,card):
+def getScore(rack):
 	score = 0
 	for i in xrange(len(rack)-1):
 		if rack[i+1]:
@@ -67,7 +67,14 @@ def getScore(rack,card):
 				score = score+1
 	return score
 
-
+def getOrderedScore(rack,card):
+	score = 0
+	ndx = closestValidFit(card, rack)
+	tmp = rack[ndx]
+	rack[ndx] = card
+	res = getScore(rack)
+	rack[ndx] = tmp
+	return res
 
 
 
