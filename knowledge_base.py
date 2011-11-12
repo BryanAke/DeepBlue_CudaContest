@@ -42,7 +42,6 @@ class Knowledge(object):
                 ret.append(run)
                 run = [i]
         return [i for i in ret if len(i) > 1]
-        
             
 def test_main():
     rack = [0]*kRackSize
