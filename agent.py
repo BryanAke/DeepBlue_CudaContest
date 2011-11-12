@@ -21,7 +21,7 @@ class Agent(object):
             ## check happiness at that index
             happy = algorithms.getHappiness(topCard, orderedIndex)
             ## check if happy is greater than threshhold
-            if(happy > knowledge_base.kOk and happy > knowledge_base.happiness[orderedIndex]):
+            if(happy > knowledge_base.kOk and happy > self.knowledge.happiness[orderedIndex]):
                 return False
             else:
                 return True
