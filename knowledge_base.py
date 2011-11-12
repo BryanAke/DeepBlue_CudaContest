@@ -5,6 +5,7 @@ from logging import debug, info, warning, error, exception, critical
 import random
 import pickle
 import os
+import math
 
 ## constants
 kCardCount = 80
@@ -116,6 +117,9 @@ class Knowledge(object):
             else:
                 self.impossibilities[i] = False
             self.happiness[i] = 1.0 - abs(((rack[i]/kCardCount) - ((i+1)/kRackSize)))
+            
+    def getIdealSlot(self, card):
+        return int(math.ceil((card/80.0) * 20) -1)
 
     def update_impossibilites_and_happiness_at_idx(self, idx):
         if (kCardCount - self.rack[idx] < kRackSize - idx or idx + 1 > self.rack[idx]):
@@ -136,7 +140,7 @@ class Knowledge(object):
         ret = []
         run = []
         for i in rack:
-            if not run or i is run[-1] :
+            if not run or i is run[-1]:
                 run.append(i)
             else:
                 ret.append(tuple(run))
@@ -147,8 +151,10 @@ class Knowledge(object):
         runs = self.rackContainsRuns(self.rack)
         importantCards = set()
         for run in runs:
-            importantCards.add(run[0] - 1)
-            importantCards.add(run[-1] + 1)
+            if rack.index(run[0]):
+                importantCards.add(run[0] - 1)
+            if rack.index(run[-1]) != len(rack) -1:
+                importantCards.add(run[-1] + 1)
 
         #possible edge cases
         importantCards.discard(0)

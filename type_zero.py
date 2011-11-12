@@ -54,7 +54,7 @@ class RackO(object):
         self.game_id = args['game_id']
 
         self.k = knowledge_base.Knowledge(args)
-        self.a = agent.Agent(self.k)
+        self.a = agent.orderingAgent(self.k)
 
         info("Starting game %d going %s against team %d.", args['game_id'], ("first", "second")[args['player_id']], args['other_player_id'])
 
@@ -100,6 +100,8 @@ class RackO(object):
         else:
             self.card = self.k.peek_discard()
             self.idx = self.a.place_card(self.card)
+            if(0 > self.idx or 20 <= self.idx):
+                info("idx(%s), card(%s)", repr(self.idx), repr(self.card) )
             our_move['move'] = 'request_discard'
             our_move['idx'] = self.idx
 

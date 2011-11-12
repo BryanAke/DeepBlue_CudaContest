@@ -1,6 +1,7 @@
 import random
 import knowledge_base
 import algorithms
+import math
 
 class Agent(object):
 
@@ -61,9 +62,12 @@ class orderingAgent(Agent):
     def place_card(self, card):
         #info(card/80.0, int(card/80.0 * 20))
         rack = self.knowledge.rack
+        
+        
+        
         if(algorithms.adjacent_inversions(rack) == 0):
             #group cards.
-            runs = [i for i in [j for j in  self.knowledge.rackContainsRuns()]]
+            runs = [x for x in [j for j in  self.knowledge.rackContainsRuns(rack)]]
             for i in range(0, len(rack)):
                 if rack[i] > card:
                     break;
@@ -74,10 +78,25 @@ class orderingAgent(Agent):
             elif rack[i - 1] in runs:
                 return i
             else:
-                return int((card/80.0) * 20)
+                return self.knowledge.getIdealSlot(card)
             
         else:
-            return int((card/80.0) * 20)
+        
+            currentSpot = self.knowledge.getIdealSlot(card)
+        
+            prev = -1
+            while(self.knowledge.happiness[currentSpot] > (algorithms.getHappiness(card, currentSpot)) and 0 <= currentSpot < 20):
+                if(currentSpot == prev):
+                    break
+                
+                prev = currentSpot
+                if (card > rack[currentSpot]):
+                    currentSpot += 1
+                else:
+                    currentSpot -= 1
+                    
+            return currentSpot
+        
         #highest_wgo = 0
         #highest_idx = 0
         #for i in range(0, len(rack)):
