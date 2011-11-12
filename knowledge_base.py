@@ -7,6 +7,13 @@ import os
 kCardCount = 80
 kRackSize = 20
 
+#thresholds
+kVeryUnhappy = .4
+kUnhappy = .6
+kOk = .8
+kHappy = .9
+kVeryHappy = 1.0
+
 ## the knowledge base which contains all of the knowledge
 ## which the player know in the game
 class Knowledge(object):
