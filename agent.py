@@ -36,3 +36,18 @@ class Agent(object):
                 elif(card - self.knowledge.rack[i] == 1):
                     return i + 1
         return algorithms.closestValidFit(card, self.knowledge.rack)
+    
+class orderingAgent(Agent):
+    def shouldDraw(self):
+        return False
+    
+    def place_card(self, card):
+        highest_wgo = 0
+        highest_idx = -1
+        rack = self.knowledge.rack
+        for i in range(0, len(rack)):
+            if rack[i] > highest_wgo and rack[i] < card:
+                highest_wgo = rack[i]
+                highest_idx = i
+        return i + 1
+    
