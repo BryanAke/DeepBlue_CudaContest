@@ -27,13 +27,25 @@ class Knowledge(object):
         idx = rack.index(val)
         return (idx != -1) and not self.impossibilities[idx]
     
-    def handContainsAdjacent(self, rack, val):
+    def rackContainsAdjacent(self, rack, val):
         return self.rackContains(rack, val + 1) or self.rackContains(rack, val - 1)
 
+    def rackContainsRuns(self, rack):
+        #return a list of tuples representing runs
+        ret = []
+        run = []
+        for i in rack:
+            if not run or i is run[-1] :
+                run.append(i)
+            else:
+                ret.append(tuple(run))
+                run = [i]
+        return [i for i in ret if len(i) > 1]
+        
             
 def test_main():
     rack = [0]*int(kRackSize)
-    for i in range(0, kRackSize):
+    for i in range(0, int(kRackSize)):
         rack[i] = random.randint(1, int(kCardCount))
     kb = Knowledge()
     kb.find_impossibilities_and_happiness(rack)
