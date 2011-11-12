@@ -57,12 +57,13 @@ class orderingAgent(Agent):
         top_card = self.knowledge.discard_pile[-1]
         if top_card in good_cards:
             return False
-        elif(self.knowledge.happiness[self.knowledge.getIdealSlot(top_card)] < 
-             algorithms.getHappiness(top_card, self.knowledge.getIdealSlot(top_card)) or
-             self.knowledge.impossibilities[self.knowledge.getIdealSlot(top_card)]):
+        elif(self.knowledge.impossibilities[self.knowledge.getIdealSlot(top_card)]):
             return False
-        else:
-            return True
+        
+        for i in range(0, self.knowledge.impossibilities):
+            if(self.knowledge.impossibilities[i] and algorithms.getHappiness(top_card, i) > knowledge_base.kOk):
+                return False
+        return True
         #else:
         #    return False
     
@@ -70,26 +71,37 @@ class orderingAgent(Agent):
         #info(card/80.0, int(card/80.0 * 20))
         rack = self.knowledge.rack         
         info("Adjacent Inversions: (%s)", repr(algorithms.adjacent_inversions(rack)))
-        if(algorithms.adjacent_inversions(rack) == 0):
+        if(card in self.knowledge.getNumsAdjacentToRuns()):
+            for i in range(0, len(rack)-1):
+                if(rack[i] > card):
+                    return i-1
+                elif(rack[i] < card):
+                    return i+1
+        elif(algorithms.adjacent_inversions(rack) == 0):
             #group cards.
-            return self.knowledge.pickLocationInSortedArr(card)
-            
-        else:
-        
-            currentSpot = self.knowledge.getIdealSlot(card)
-        
-            prev = -1
-            while( (0 <= currentSpot < 20) and self.knowledge.happiness[currentSpot] > (algorithms.getHappiness(card, currentSpot))):
-                if(currentSpot == prev):
-                    break
-                
-                prev = currentSpot
-                if (card > rack[currentSpot]):
-                    currentSpot += 1
-                else:
-                    currentSpot -= 1
+            ##return self.knowledge.pickLocationInSortedArr(card)
+            currentBestIndex = -1
+            for i in range(0, len(rack)):
+                if(not self.knowledge.isInRun(rack[i])):
+                    if(currentBestIndex < 0):
+                        currentBestIndex = i
+                    elif(algorithms.getHappiness(card, currentBestIndex) < algorithms.getHappiness(card, i)):
+                        currentBestIndex = i
+            return currentBestIndex
                     
-            return currentSpot
+        currentSpot = self.knowledge.getIdealSlot(card)
+        prev = -1
+        while( (0 <= currentSpot < 20) and self.knowledge.happiness[currentSpot] > (algorithms.getHappiness(card, currentSpot))):
+            if(currentSpot == prev):
+                break
+            
+            prev = currentSpot
+            if (card > rack[currentSpot]):
+                currentSpot += 1
+            else:
+                currentSpot -= 1
+                
+        return currentSpot
         
         #highest_wgo = 0
         #highest_idx = 0

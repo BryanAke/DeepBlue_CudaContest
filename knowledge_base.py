@@ -209,6 +209,12 @@ class Knowledge(object):
             return 0.0
         removedCards = kCardCount - kRackSize - len(self.discard_pile) 
         return 1/removedCards  
+    
+    def isInRun(self, card):
+        for run in self.runs:
+            if(run[0] <= card <= run[1]):
+                return True
+        return False
 
     def pickle(self):
         fileName = os.path.join("pickledKnowledge", str(self.game_id) + "_" + str(self.other_player_id) + ".pickle")
