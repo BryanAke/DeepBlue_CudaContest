@@ -126,7 +126,7 @@ class Knowledge(object):
             self.happiness[i] = 1.0 - abs(((rack[i]/kCardCount) - ((i+1)/kRackSize)))
 
     def getIdealSlot(self, card):
-        return int(math.ceil((card/80.0) * 20) -1)
+        return int(math.ceil((card/80.0) * 20)) -1
 
     def update_impossibilites_and_happiness_at_idx(self, idx):
         if (kCardCount - self.rack[idx] < kRackSize - idx or idx + 1 > self.rack[idx]):
@@ -214,14 +214,18 @@ class Knowledge(object):
     def getNumsAdjacentToRuns(self):
         importantCards = set()
         for run in self.runs:
-            importantCards.add(run[0]-1)
-            importantCards.add(run[1]+1)
+            importantCards.add((run[0]-1, run[2] - 1))
+            importantCards.add((run[1]+1, run[3] ))
 
-        #possible edge cases
-        importantCards.discard(0)
-        importantCards.discard(81)
 
         return importantCards
+    
+    def findRunIdx(self, card):
+        adjNums = self.getNumsAdjacentToRuns()
+        for tu in adjNums:
+            if tu[0] == card:
+                return tu[1]
+        return None
 
 
     def getIndicesInSortedArr(self, card):
@@ -276,6 +280,11 @@ class Knowledge(object):
             if(run[0] <= card <= run[1]):
                 return True
         return False
+    
+    def getRun(self, card):
+        for run in self.runs:
+            if(run[0] <= card <= run[1]):
+                return run
     
     def speculateSorted(self, card):
         sortedness = algorithms.adjacent_inversions(self.rack)

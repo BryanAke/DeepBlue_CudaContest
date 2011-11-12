@@ -53,9 +53,12 @@ class Agent(object):
 
 class orderingAgent(Agent):
     def shouldDraw(self):
-        good_cards = self.knowledge.getNumsAdjacentToRuns()
+        
         top_card = self.knowledge.discard_pile[-1]
-        if top_card in good_cards:
+        
+        runIdx = self.knowledge.findRunIdx(top_card)
+        if(runIdx is not None):
+            self.cachedSlot = runIdx
             return False
         
         if algorithms.adjacent_inversions(self.knowledge.rack) > 0:
@@ -82,28 +85,30 @@ class orderingAgent(Agent):
         #info(card/80.0, int(card/80.0 * 20))
         rack = self.knowledge.rack         
         info("Adjacent Inversions: (%s)", repr(algorithms.adjacent_inversions(rack)))
-        if(card in self.knowledge.getNumsAdjacentToRuns()):
-            for i in range(0, len(rack)):
-                if(rack[i] > card):
-                    if (i == 0):
-                        return i
-                    else:
-                        return i-1
-                elif(rack[i] < card):
-                    if(i == len(rack)-1):
-                        return len(rack)-1
-                    else:
-                        return i+1
+        
+        runIdx = self.knowledge.findRunIdx(card)
+        if(runIdx is not None):
+            return runIdx
+        
         else:
             currentSpot = self.knowledge.getIdealSlot(card)
             prev = -1
             while( (0 <= currentSpot < 20) and self.knowledge.happiness[currentSpot] > 
                    (algorithms.getHappiness(card, currentSpot))):
-                if(currentSpot == prev):
-                    break
-                prev = currentSpot
-                if (card > rack[currentSpot]):
-                    currentSpot += 1
+                
+                if self.knowledge.isInRun(rack[currentSpot]):
+                    run = self.knowledge.getRun(rack[currentSpot])
+                    if card < run[0]:
+                        return run[2] - 1
+                    else:
+                        return run[3]
                 else:
-                    currentSpot -= 1
+                    if(currentSpot == prev):
+                        break
+                    
+                    prev = currentSpot
+                    if (card > rack[currentSpot]):
+                        currentSpot += 1
+                    else:
+                        currentSpot -= 1
             return currentSpot
