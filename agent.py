@@ -50,12 +50,15 @@ class orderingAgent(Agent):
         return False
     
     def place_card(self, card):
-        highest_wgo = 0
-        highest_idx = 0
-        rack = self.knowledge.rack
-        for i in range(0, len(rack)):
-            if rack[i] > highest_wgo and rack[i] < card:
-                highest_wgo = rack[i]
-                highest_idx = i
-        return i + 1
+        #info(card/80.0, int(card/80.0 * 20))
+        return int((card/80.0) * 20)
+        #highest_wgo = 0
+        #highest_idx = 0
+        #rack = self.knowledge.rack
+        #for i in range(0, len(rack)):
+        #    if rack[i] > highest_wgo and rack[i] < card and self.knowledge.happiness[i] > .8:
+        #        highest_wgo = rack[i]
+        #        highest_idx = i
+        #if (i is 0 and card > 15):
+        #return i + 1
     
