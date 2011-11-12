@@ -9,7 +9,7 @@ def adjacent_inversions(rack):
 	return order
 
 def closest_indecies(rack):
-	#returns the indecies of the rack that have numbers 
+	#returns the indecies of the rack that have numbers
 	#that are closest together
 	dist = 100
 	for i in xrange(len(rack)-1):
@@ -20,7 +20,7 @@ def closest_indecies(rack):
 	return ret
 
 
-#deterine whether to use the 'normal' distibution to model 
+#deterine whether to use the 'normal' distibution to model
 #(which uses the happiness function) or whether to use the
 #'relative' distribution model (which fits places cards based
 #on their best relative location
@@ -45,12 +45,16 @@ def best_fit(card, rack):
 		for tup in runs:
 			if card in tup:
 				return rack.index(card)
+<<<<<<< HEAD
 			elif True in knowledge.impossibilities and rack.index(True):		
+=======
+			elif True in knowledge.impossibilities and rack.index(True):
+>>>>>>> 4ae13efe8f588659374dd5e23a255d4550abe9c9
 				print "Holder 2"
-				
+
 
 def closestValidFit(card,rack):
-	#return index of location that best fits 
+	#return index of location that best fits
 	for i in xrange(len(rack)-1):
 		if card < rack[i]:
 			continue
@@ -59,4 +63,4 @@ def closestValidFit(card,rack):
 		return (i-1)
 
 def getHappiness(card, index):
-	return 1.0 - abs(((card/kCardCount) - ((index+1)/kRackSize)))
+	return 1.0 - abs(((card/knowledge_base.kCardCount) - ((index+1)/knowledge_base.kRackSize)))

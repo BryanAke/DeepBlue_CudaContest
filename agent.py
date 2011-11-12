@@ -14,11 +14,11 @@ class Agent(object):
             topCard = self.knowledge.discard_pile[0]
         if(topCard >= 0):
             ## greedily find ordered index (least)
-            orderedIndex = closestValidFit(topCard, self.knowledge.rack)
+            orderedIndex = algorithms.closestValidFit(topCard, self.knowledge.rack)
             ## check happiness at that index
-            happy = getHappiness(topCard, orderedIndex)
+            happy = algorithms.getHappiness(topCard, orderedIndex)
             ## check if happy is greater than threshhold
-            if(happy > kOk):
+            if(happy > knowledge_base.kOk and happy > knowledge_base.happiness[orderedIndex]):
                 return False
             else:
                 return True
@@ -26,4 +26,4 @@ class Agent(object):
             return True
 
     def place_card(self, card):
-        return closestValidFit(card, self.knowledge.rack)
+        return algorithms.closestValidFit(card, self.knowledge.rack)
