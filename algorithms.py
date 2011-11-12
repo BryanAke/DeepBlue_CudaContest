@@ -67,7 +67,14 @@ def getScore(rack):
 				score = score+1
 	return score
 
-
+def getScore(rack,card):
+	score = 0
+	ndx = closestValidFit(card, rack)
+	tmp = rack[ndx]
+	rack[ndx] = card
+	res = getScore(rack)
+	rack[ndx] = tmp
+	return res
 
 
 
