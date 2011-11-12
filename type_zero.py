@@ -3,12 +3,11 @@ from SimpleXMLRPCServer import SimpleXMLRPCServer
 import logging
 from logging import debug, info, warning, error, exception, critical
 
-import collections
 import functools
-import random
 import socket
 import sys
 
+import agent
 import knowledge_base
 
 LISTEN = ('0.0.0.0', 1337)
@@ -66,10 +65,10 @@ class RackO(object):
 		if args['game_id'] != self.game_id:
 			error("Got a request for a move in non-active game.")
 
-		if not self.rack:
+		if not self.k.rack:
 			self.k.set_initial_rack(args['rack'])
 
-		self.k.time(['remaining_microseconds'])
+		self.k.ttg(['remaining_microseconds'])
 		#sys.stderr.write("\r{:8d}".format(args['remaining_microseconds']))
 
 		if args['other_player_moves']:
@@ -94,7 +93,7 @@ class RackO(object):
 		if args['game_id'] != self.game_id:
 			error("Got a request for a move in non-active game.")
 
-		self.k.time(args['remaining_microseconds'])
+		self.k.ttg(args['remaining_microseconds'])
 
 		self.card = args['card']
 		self.idx = self.a.place_card(self.card)
@@ -118,11 +117,13 @@ class RackO(object):
 		if args['game_id'] != self.game_id:
 			error("Got a request for a move in non-active game.")
 
-		self.k.finish(args['your_score'], args['other_score'], args['reason'])
+		self.k.final(args['your_score'], args['other_score'], args['reason'])
 
 		self.k.pickle()
 
 		info("The game is over after %d moves: %d - %d because %s", self.k.moves, args['your_score'], args['other_score'], args['reason'])
+
+		self.game_id = None
 
 		return ""
 
