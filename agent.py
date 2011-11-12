@@ -3,6 +3,9 @@ import knowledge_base
 import algorithms
 import math
 
+import logging
+from logging import debug, info, warning, error, exception, critical
+
 class Agent(object):
 
     def __init__(self, knowledgeBase):
@@ -64,28 +67,17 @@ class orderingAgent(Agent):
         rack = self.knowledge.rack
         
         
-        
+        info("Adjacent Inversions: (%s)", repr(algorithms.adjacent_inversions(rack)))
         if(algorithms.adjacent_inversions(rack) == 0):
             #group cards.
-            runs = [x for x in [j for j in  self.knowledge.rackContainsRuns(rack)]]
-            for i in range(0, len(rack)):
-                if rack[i] > card:
-                    break;
-                
-            if rack[i] in runs:
-                #beginning of a run
-                return i - 1
-            elif rack[i - 1] in runs:
-                return i
-            else:
-                return self.knowledge.getIdealSlot(card)
+            return self.knowledge.pickLocationInSortedArr(card)
             
         else:
         
             currentSpot = self.knowledge.getIdealSlot(card)
         
             prev = -1
-            while(self.knowledge.happiness[currentSpot] > (algorithms.getHappiness(card, currentSpot)) and 0 <= currentSpot < 20):
+            while( (0 <= currentSpot < 20) and self.knowledge.happiness[currentSpot] > (algorithms.getHappiness(card, currentSpot))):
                 if(currentSpot == prev):
                     break
                 
