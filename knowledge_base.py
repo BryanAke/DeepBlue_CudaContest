@@ -158,11 +158,9 @@ class Knowledge(object):
             importantCards.add(run[0] - 1)
             importantCards.add(run[-1] + 1)
         
-        if 0 in importantCards:
-            importantCards.remove(0)
-            
-        if 81 in importantCards:
-            importantCards.remove(81)
+        #possible edge cases
+        importantCards.discard(0)
+        importantCards.discard(81)
             
         return importantCards
 
