@@ -91,24 +91,25 @@ class orderingAgent(Agent):
             return runIdx
         
         else:
-            currentSpot = self.knowledge.getIdealSlot(card)
-            prev = -1
-            while( (0 <= currentSpot < 20) and self.knowledge.happiness[currentSpot] > 
-                   (algorithms.getHappiness(card, currentSpot))):
-                
-                if self.knowledge.isInRun(rack[currentSpot]):
-                    run = self.knowledge.getRun(rack[currentSpot])
-                    if card < run[0]:
-                        return run[2] - 1
-                    else:
-                        return run[3]
-                else:
-                    if(currentSpot == prev):
-                        break
-                    
-                    prev = currentSpot
-                    if (card > rack[currentSpot]):
-                        currentSpot += 1
-                    else:
-                        currentSpot -= 1
-            return currentSpot
+            return self.knowledge.getNonRunPosition(card)
+#            currentSpot = self.knowledge.getIdealSlot(card)
+#            prev = -1
+#            while(( (0 <= currentSpot < 20) and self.knowledge.happiness[currentSpot] > 
+#                   (algorithms.getHappiness(card, currentSpot)) or (self.knowledge.isInRun(rack[currentSpot])))):
+#                
+#                if self.knowledge.isInRun(rack[currentSpot]):
+#                    run = self.knowledge.getRun(rack[currentSpot])
+#                    if card < run[0]:
+#                        return run[2] - 1
+#                    else:
+#                        return run[3]
+#                else:
+#                    if(currentSpot == prev):
+#                        break
+#                    
+#                    prev = currentSpot
+#                    if (card > rack[currentSpot]):
+#                        currentSpot += 1
+#                    else:
+#                        currentSpot -= 1
+#            return currentSpot

@@ -285,6 +285,56 @@ class Knowledge(object):
         for run in self.runs:
             if(run[0] <= card <= run[1]):
                 return run
+            
+    def getNonRunPosition(self, card):
+        upperRun = None
+        lowerRun = None
+        for pretendCard  in range(card, len(self.rack)):
+            upperRun = self.getRun(pretendCard)
+            if upperRun is not None:
+                break
+        
+        for pretendCard  in range(card, 0, -1):
+            lowerRun = self.getRun(pretendCard)
+            if lowerRun is not None:
+                break
+        
+        
+        if upperRun is None:
+            maxIdx = len(self.rack) - 1 
+        else:
+            maxIdx = upperRun[2] -1 
+            
+        if lowerRun is None:
+            minIdx = 0 
+        else:
+            minIdx = lowerRun[3]
+
+
+        if minIdx > maxIdx:
+            if self.runLength(lowerRun) > self.runLength(upperRun):
+                return minIdx
+            else:
+                return maxIdx
+        elif minIdx == maxIdx:
+            return minIdx
+        else:
+            subRack = self.rack[minIdx:maxIdx + 1]
+            minDisorder = algorithms.adjacent_inversions(subRack) + 1
+            idx = -1
+            for i in range(len(subRack)):
+                do = algorithms.adjacent_inversions(subRack, i, card)
+                if do < minDisorder:
+                    minDisorder = do
+                    idx = i
+            if idx is -1:
+                return minIdx
+            return minIdx + idx
+            
+                
+        
+    def runLength(self, run):
+        return run[1] - run[0]
     
     def speculateSorted(self, card):
         sortedness = algorithms.adjacent_inversions(self.rack)
