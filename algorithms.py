@@ -30,4 +30,28 @@ def normal_or_relative(rack):
 		return 1
 	return 0
 
-		
+#check to see where the best location for a card would be
+#in the deck
+def best_fit(card, rack):
+	if !normal_relative(rack):
+		#use the happiness function
+		#return the position
+	#use the relative function
+	runs = getRunsAdjacentToRuns(rack)
+	if runs:
+		for tup in runs:
+			if card in tup:
+				return rack.index(card)
+			elif True in knowledge.impossibilities 
+				
+
+def closestValidFit(card,rack):
+	#return index of location that best fits 
+	for i in xrange(len(rack)-1):
+		if card < rack[i]:
+			continue
+		if i==0:
+			return i
+		return (i-1)
+
+
