@@ -7,6 +7,8 @@ import pickle
 import os
 import math
 
+import algorithms
+
 ## constants
 kCardCount = 80
 kRackSize = 20
@@ -29,10 +31,13 @@ class Knowledge(object):
         self.deck = set(xrange(1,kCardCount + 1))
         self.deck_size = kCardCount - 2 * kRackSize - 1
 
+        self.runs = []
+
         self.game_id = args['game_id']
         self.player_id = args['player_id']
         self.other_player_id = args['other_player_id']
         self.other_rack = [None] * kRackSize
+        self.other_other_cards = []
 
         self.orig_discard = args['initial_discard']
         self.rack = self.orig_rack = []
@@ -61,6 +66,7 @@ class Knowledge(object):
     def set_initial_rack(self, rack):
         self.rack = self.orig_rack = rack
         self.deck.difference_update(rack)
+        self.update_runs()
 
     def their_move(self, move, discard):
         if move['move'] == 'take_discard':
@@ -96,6 +102,7 @@ class Knowledge(object):
             self.rack[idx] = card
 
         self.update_impossibilites_and_happiness_at_idx(idx)
+        self.update_runs()
 
     def final(self, us, them, reason):
         self.our_score = us
@@ -147,28 +154,39 @@ class Knowledge(object):
                 run = [i]
         return [i for i in ret if len(i) > 1]
 
-	def runs_with_indicies(self):
-		runs = []
-		start = stop = 0
-		for i in xrange(1,len(self.rack)):
-			if self.rack[i] == self.rack[i-1]+1:
-				stop = i
-			else:
-				if start != stop:
-					runs.append((self.rack[start], self.rack[stop], start, stop))
-				start = stop = i
-		if start != stop:
-			runs.append((self.rack[start], self.rack[stop], start, stop))
-		return runs
+    def update_runs(self):
+        self.runs = []
+        start = 0
+        stop = 1
+        for i in xrange(1,len(self.rack)):
+            if self.rack[i] == self.rack[i-1]+1:
+                stop = i+1
+            else:
+                if start != stop:
+                    self.runs.append((self.rack[start], self.rack[stop-1], start, stop))
+                start = i
+                stop = i + 1
+        if start != stop:
+            self.runs.append((self.rack[start], self.rack[stop-1], start, stop))
+
+        def run_weight(r):
+            w = (r[3]-r[2]) * algorithms.getHappiness((r[0]+r[1])/2, (r[2]+r[3]-1)/2)
+            if r[0] in self.deck and r[1] in self.deck:
+                w *= 2
+            if r[0] not in self.deck and r[1] not in self.deck:
+                w *= 0
+            return w
+
+        self.runs.sort(key=run_weight, reverse=True)
+
+        while self.runs and run_weight(self.runs[-1]) == 0:
+            self.runs.pop()
 
     def getNumsAdjacentToRuns(self):
-        runs = self.rackContainsRuns(self.rack)
         importantCards = set()
-        for run in runs:
-            if self.rack.index(run[0]) != 0:
-                importantCards.add(run[0] - 1)
-            if self.rack.index(run[-1]) != len(self.rack) -1:
-                importantCards.add(run[-1] + 1)
+        for run in self.runs:
+            importantCards.add(run[0]-1)
+            importantCards.add(run[1]+1)
 
         #possible edge cases
         importantCards.discard(0)

@@ -51,52 +51,89 @@ class orderingAgent(Agent):
         #if(algorithms.adjacent_inversions(rack) == 0):
             #group cards.
         good_cards = self.knowledge.getNumsAdjacentToRuns()
-        top_card = self.knowledge.discard_pile[-1]
+        top_card = self.knowledge.peek_discard()
         if top_card in good_cards:
             return False
         else:
             return True
         #else:
         #    return False
-    
+
     def place_card(self, card):
         #info(card/80.0, int(card/80.0 * 20))
         rack = self.knowledge.rack
-        
-        
-        
+
+        # Finish a run.  The runs are sorted in order from "best" to "worst", so complete the first one.
+        for run in self.knowledge.runs:
+            if card == run[0]-1 and run[2] != 0:
+                # We can insert this card at the beginning of the run
+                return run[2]-1
+            if card == run[1]+1 and run[3] != len(self.knowledge.rack):
+                # We can insert this card at the end of the run
+                return run[3]+1
+
         if(algorithms.adjacent_inversions(rack) == 0):
-            #group cards.
-            runs = [x for x in [j for j in  self.knowledge.rackContainsRuns(rack)]]
-            for i in range(0, len(rack)):
-                if rack[i] > card:
-                    break;
-                
-            if rack[i] in runs:
-                #beginning of a run
-                return i - 1
-            elif rack[i - 1] in runs:
-                return i
-            else:
-                return self.knowledge.getIdealSlot(card)
-            
-        else:
-        
-            currentSpot = self.knowledge.getIdealSlot(card)
-        
-            prev = -1
-            while(self.knowledge.happiness[currentSpot] > (algorithms.getHappiness(card, currentSpot)) and 0 <= currentSpot < 20):
-                if(currentSpot == prev):
+            # We're already in sorted order, so keep it that way.
+            for loc in xrange(len(rack)):
+                if rack[loc] > card:
                     break
-                
-                prev = currentSpot
-                if (card > rack[currentSpot]):
-                    currentSpot += 1
-                else:
-                    currentSpot -= 1
-                    
-            return currentSpot
-        
+            # We can replace either loc or loc-1, except
+            if loc == 0:
+                return loc
+            for run in self.knowledge.runs:
+                if run[2] <= loc < run[3]:
+                    # loc conflicts with this run, so use loc-1
+                    return loc-1
+                if run[2] <= loc-1 < run[3]:
+                    # loc-1 conflicts with this run, so use loc
+                    return loc
+        else:
+            # Not yet sorted
+            currentSpot = self.knowledge.getIdealSlot(card)
+
+            for k, r in enumerate(self.knowledge.runs):
+                if r[2] <= currentSpot < r[3]:
+                    # This card collides with a run in the Ideal slot
+                    if card < r[0]:
+                        if r[0] != 0:
+                            newSpot = r[2] - 1
+                            delta = +1
+                            break
+                        else:
+                            return 0
+                    if car > r[3]:
+                        if r[3] != len(rack):
+                            newSpot = r[3]
+                            delta = -1
+                            break
+                        else:
+                            return r[3] - 1
+            else:
+                prev = -1
+                while(0 <= currentSpot < 20 and self.knowledge.happiness[currentSpot] > (algorithms.getHappiness(card, currentSpot))):
+                    if(currentSpot == prev):
+                        break
+
+                    prev = currentSpot
+                    if (card > rack[currentSpot]):
+                        currentSpot += 1
+                    else:
+                        currentSpot -= 1
+
+                return currentSpot
+
+            if newSpot == currentSpot:
+                return currentSpot
+
+            for n, r in enumerate(self.knowledge.runs):
+                if r[2] <= newSpot < r[3]:
+                    if k < n:
+                        return newSpot
+                    elif n < k:
+                        return newSpot + delta
+            return newSpot
+
+
         #highest_wgo = 0
         #highest_idx = 0
         #for i in range(0, len(rack)):
