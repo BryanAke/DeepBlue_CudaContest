@@ -161,21 +161,34 @@ class Knowledge(object):
         importantCards.discard(81)
 
         return importantCards
+    
+    ## returns the probabilty of drawing a card from the deck
+    def probabilityToDraw(self, card):
+        if (card in self.discard_pile and card != peak_discard()):
+            return 0.0
+        removedCards = kCardCount - kRackSize - len(self.discard_pile) 
+        return 1/removedCards  
 
     def pickle(self):
         fileName = os.path.join("pickledKnowledge", str(self.game_id) + "_" + str(self.other_player_id) + ".pickle")
         with open(fileName, 'w') as file:
             pickle.dump(self, file)
 
-# def test_main():
-#     rack = [0]*kRackSize
-#     for i in range(0, kRackSize):
-#         rack[i] = random.randint(1, kCardCount)
-#     kb = Knowledge()
-#     kb.find_impossibilities_and_happiness(rack)
-#     print "Rack: " + str(rack)
-#     print "Happiness: " + str(kb.happiness)
-#     print "Impossibilities: " + str(kb.impossibilities)
-#
-# if __name__ == '__main__':
-#     test_main()
+def test_main():
+    rack = [0]*kRackSize
+    for i in range(0, kRackSize):
+        rack[i] = random.randint(1, kCardCount)
+    args = dict()
+    args['game_id'] = 1243
+    args['player_id'] = 0
+    args['other_player_id'] = 1
+    args['initial_discard'] = 3
+    kb = Knowledge(args)
+    kb.find_impossibilities_and_happiness(rack)
+    print "Rack: " + str(rack)
+    print "Happiness: " + str(kb.happiness)
+    print "Impossibilities: " + str(kb.impossibilities)
+    print "Probability to pull a 5: " + str(kb.probabilityToDraw(5))
+ 
+if __name__ == '__main__':
+    test_main()

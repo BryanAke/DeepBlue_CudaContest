@@ -76,10 +76,6 @@ def getOrderedScore(rack,card):
 	rack[ndx] = tmp
 	return res
 
-
-
-
-
-
 def getHappiness(card, index):
 	return 1.0 - abs(((card/knowledge_base.kCardCount) - ((index+1)/knowledge_base.kRackSize)))
+	
