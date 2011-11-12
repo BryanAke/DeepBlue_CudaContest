@@ -74,10 +74,10 @@ class RackO(object):
         #sys.stderr.write("\r{:8d}".format(args['remaining_microseconds']))
 
         if args['other_player_moves']:
-            self.k.their_move(args['other_player_moves'][0][1], args['discard'])
+            move = args['other_player_moves'][0][1]
 
             if move['move'] == 'take_discard':
-                debug("The other player took %d and put it in slot %d.", card, move['idx'])
+                debug("The other player took %d and put it in slot %d.", self.k.peek_discard(), move['idx'])
             elif move['move'] == 'take_deck':
                 debug("The other player drew and put it in slot %d.", move['idx'])
             elif move['move'] == 'no_move':
@@ -88,6 +88,8 @@ class RackO(object):
                 debug("The other player timed out.")
             else:
                 error("The other player did something unknown!")
+
+            self.k.their_move(move, args['discard'])
 
 
         our_move = { }
