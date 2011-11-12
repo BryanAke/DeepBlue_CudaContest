@@ -103,6 +103,10 @@ class RackO(object):
             self.idx = self.a.place_card(self.card)
             if(0 > self.idx or 20 <= self.idx):
                 info("idx(%s), card(%s)", repr(self.idx), repr(self.card) )
+            if self.idx < 0:
+                self.idx = 0
+            if self.idx >= 20:
+                self.idx = 19
             our_move['move'] = 'request_discard'
             our_move['idx'] = self.idx
 
@@ -118,6 +122,12 @@ class RackO(object):
 
         self.card = args['card']
         self.idx = self.a.place_card(self.card)
+        if(0 > self.idx or 20 <= self.idx):
+            info("idx(%s), card(%s)", repr(self.idx), repr(self.card) )
+        if self.idx < 0:
+            self.idx = 0
+        if self.idx >= 20:
+            self.idx = 19
 
         return self.idx
 
