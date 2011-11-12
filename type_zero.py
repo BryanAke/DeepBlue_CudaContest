@@ -70,7 +70,7 @@ class RackO(object):
 		if not self.k.rack:
 			self.k.set_initial_rack(args['rack'])
 
-		self.k.ttg(['remaining_microseconds'])
+		self.k.ttg(args['remaining_microseconds'])
 		#sys.stderr.write("\r{:8d}".format(args['remaining_microseconds']))
 
 		if args['other_player_moves']:
