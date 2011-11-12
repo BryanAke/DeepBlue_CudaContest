@@ -151,12 +151,19 @@ class Knowledge(object):
                 run = [i]
         return [i for i in ret if len(i) > 1]
 
-    def getNumsAdjacentToRuns(self, rack):
-        runs = self.rackContainsRuns(rack)
+    def getNumsAdjacentToRuns(self):
+        runs = self.rackContainsRuns(self.rack)
         importantCards = set()
         for run in runs:
             importantCards.add(run[0] - 1)
             importantCards.add(run[-1] + 1)
+        
+        if 0 in importantCards:
+            importantCards.remove(0)
+            
+        if 81 in importantCards:
+            importantCards.remove(81)
+            
         return importantCards
 
     def pickle(self):
