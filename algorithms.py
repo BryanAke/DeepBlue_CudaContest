@@ -1,5 +1,3 @@
-import knowledge_base
-
 threshold = 10
 def adjacent_inversions(rack):
 	order = 0;
@@ -57,6 +55,6 @@ def closestValidFit(card,rack):
 		if i==0:
 			return i
 		return (i-1)
+	return 0
 
-def getHappiness(card, index):
-	return 1.0 - abs(((card/kCardCount) - ((index+1)/kRackSize)))
+
