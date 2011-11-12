@@ -7,6 +7,7 @@ import collections
 import functools
 import random
 import socket
+import sys
 
 LISTEN = ('0.0.0.0', 1337)
 
@@ -89,21 +90,22 @@ class RackO(object):
 	@trycatch
 	def get_move(self, args):
 		debug("get_move(%s)", repr(args))
-		self.moves += 1
 
 		if args['game_id'] != self.game_id:
-			#error("Got a request for a move in non-active game.")
+			error("Got a request for a move in non-active game.")
+
+		self.moves += 1
 
 		if self.rack:
 			if self.rack != args['rack']:
-				print("Our rack is out-of-sync!")
+				error("Our rack is out-of-sync!")
 				self.rack = args['rack']
 		else:
 			self.rack = args['rack']
 			self.deck.difference_update(self.rack)
 
 		self.timeleft = args['remaining_microseconds']
-		print "{:7d}".format(args['remaining_microseconds'])
+		sys.stderr.write("\r{:8d}".format(args['remaining_microseconds']))
 
 		if args['other_player_moves']:
 			other_move = args['other_player_moves'][0][1]
@@ -165,9 +167,9 @@ class RackO(object):
 		elif move == 'move_ended_game':
 			debug("The game is over: %s", args['reason'])
 		elif move == 'illegal':
-			print("We made an illegal move: %s", args['reason'])
+			error("We made an illegal move: %s", args['reason'])
 		elif move == 'timed_out':
-			print("We timed out.")
+			error("We timed out.")
 		else:
 			error("We did something unexpected.")
 
@@ -179,7 +181,7 @@ class RackO(object):
 		if args['game_id'] != self.game_id:
 			error("Got a request for a move in non-active game.")
 
-		print("The game is over after %d moves: %d - %d because %s", self.moves, args['your_score'], args['other_score'], args['reason'])
+		info("The game is over after %d moves: %d - %d because %s", self.moves, args['your_score'], args['other_score'], args['reason'])
 
 		return ""
 
