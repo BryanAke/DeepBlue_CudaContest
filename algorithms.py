@@ -76,10 +76,38 @@ def getOrderedScore(rack,card):
 	rack[ndx] = tmp
 	return res
 
+#define a function that returns the probability of a run (2 or more cards ever extending to a run of 5
+#if the probability is zero then exclude it
 
 
-
-
+def checkDiscard(num):
+	for elem in self.discard_pile:
+		if num is elem:
+			return true
+	for elem in self.other_rack:
+		if num is elem:
+			return true
+	return false
+	
+#find out whether 5 card run is possible to create
+def getRunCompletion(run):
+	ascend = range(run[-1]+1,run[0]+5)
+	decend = range(run[0]-1,run[-1]-5,-1)
+	a = false
+	d = false
+	if (run[0]+5) <= 80:
+		for num in ascend:
+			if checkDiscard(num):
+				continue
+			a = true
+	if (run[-1]-5) >=1:
+		for num in decend:
+			if checkDiscard(num):
+				continue
+			d = true
+	res = (a,d)
+	return res
 
 def getHappiness(card, index):
 	return 1.0 - abs(((card/knowledge_base.kCardCount) - ((index+1)/knowledge_base.kRackSize)))
+	
