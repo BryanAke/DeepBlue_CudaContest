@@ -6,7 +6,7 @@ class Agent(object):
         self.knowledge = knowledgeBase
 
     def should_draw(self):
-        return true
+        return True
 
     def place_card(self, card):
         return random.randint(0, 19)
