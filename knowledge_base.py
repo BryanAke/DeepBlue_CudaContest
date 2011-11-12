@@ -149,8 +149,8 @@ class Knowledge(object):
                 run = [i]
         return [i for i in ret if len(i) > 1]
 
-    def getNumsAdjacentToRuns(self, rack):
-        runs = self.rackContainsRuns(rack)
+    def getNumsAdjacentToRuns(self):
+        runs = self.rackContainsRuns(self.rack)
         importantCards = set()
         for run in runs:
             importantCards.add(run[0] - 1)
