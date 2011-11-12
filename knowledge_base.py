@@ -117,7 +117,7 @@ class Knowledge(object):
             else:
                 self.impossibilities[i] = False
             self.happiness[i] = 1.0 - abs(((rack[i]/kCardCount) - ((i+1)/kRackSize)))
-            
+
     def getIdealSlot(self, card):
         return int(math.ceil((card/80.0) * 20) -1)
 
@@ -140,20 +140,34 @@ class Knowledge(object):
         ret = []
         run = []
         for i in rack:
-            if not run or i is run[-1]:
+            if not run or i == run[-1] + 1:
                 run.append(i)
             else:
                 ret.append(tuple(run))
                 run = [i]
         return [i for i in ret if len(i) > 1]
 
+	def runs_with_indicies(self):
+		runs = []
+		start = stop = 0
+		for i in xrange(1,len(self.rack)):
+			if self.rack[i] == self.rack[i-1]+1:
+				stop = i
+			else:
+				if start != stop:
+					runs.append((self.rack[start], self.rack[stop], start, stop))
+				start = stop = i
+		if start != stop:
+			runs.append((self.rack[start], self.rack[stop], start, stop))
+		return runs
+
     def getNumsAdjacentToRuns(self):
         runs = self.rackContainsRuns(self.rack)
         importantCards = set()
         for run in runs:
-            if rack.index(run[0]):
+            if self.rack.index(run[0]) != 0:
                 importantCards.add(run[0] - 1)
-            if rack.index(run[-1]) != len(rack) -1:
+            if self.rack.index(run[-1]) != len(self.rack) -1:
                 importantCards.add(run[-1] + 1)
 
         #possible edge cases
