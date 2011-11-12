@@ -8,23 +8,15 @@ import random
 LISTEN = ('0.0.0.0', 1337)
 
 root = logging.getLogger("")
-root.setLevel(logging.DEBUG)
+root.setLevel(logging.INFO)
 
-ch = logging.StreamHandler()
-ch.setLevel(logging.DEBUG)
+#ch = logging.StreamHandler()
+#ch.setLevel(logging.INFO)
 
-root.addHandler(ch)
-root.addHandler(logging.FileHandler("type_zero.log"))
+#root.addHandler(ch)
+#root.addHandler(logging.FileHandler("type_zero.log"))
 
 class RackO(object):
-	def ping(self, p):
-		debug("ping(%s)", repr(p))
-		try:
-			return "pong"
-		except Exception:
-			exception("")
-			raise
-
 	def _push_discard(self, card):
 		debug("Added %d to the discard pile", card)
 		self.discard.append(card)
@@ -34,6 +26,25 @@ class RackO(object):
 		card = self.discard.pop()
 		debug("Took %d from the discard pile", card)
 		return card
+
+	def _print_game_state(self):
+		print "Turn", self.moves
+		if self.player_id == 0:
+			print "Us:", self.rack
+			print "Them:", self.other_rack
+		else:
+			print "Them:", self.other_rack
+			print "Us:", self.rack
+		print "Deck contains", self.deck_size, "cards from", self.deck
+		print "Discard pile contains", self.discard
+
+	def ping(self, p):
+		debug("ping(%s)", repr(p))
+		try:
+			return "pong"
+		except Exception:
+			exception("")
+			raise
 
 	def start_game(self, args):
 		debug("start_game(%s)", repr(args))
@@ -46,6 +57,8 @@ class RackO(object):
 			self.deck = set(range(1, 81))
 			self.deck_size = 80 - 20 - 20 - 1
 			self.rack = []
+
+			self.moves = 0
 
 			self.other_rack = [None] * 20
 
@@ -61,6 +74,8 @@ class RackO(object):
 	def get_move(self, args):
 		debug("get_move(%s)", repr(args))
 		try:
+			self.moves += 1
+
 			if args['game_id'] != self.game_id:
 				error("Got a request for a move in non-active game.")
 
@@ -79,17 +94,17 @@ class RackO(object):
 				if other_move['move'] == 'take_discard':
 					card = self._pop_discard()
 					self.other_rack[other_move['idx']] = card
-					info("The other player took %d and put it in slot %d.", card, other_move['idx'])
+					debug("The other player took %d and put it in slot %d.", card, other_move['idx'])
 				elif other_move['move'] == 'take_deck':
 					self.other_rack[other_move['idx']] = 0
 					self.deck_size -= 1
-					info("The other player drew and put it in slot %d.", other_move['idx'])
+					debug("The other player drew and put it in slot %d.", other_move['idx'])
 				elif other_move['move'] == 'no_move':
-					info("The other player made no move.")
+					debug("The other player made no move.")
 				elif other_move['move'] == 'illegal':
-					info("The other player made an illegal move: %s.", other_move['reason'])
+					debug("The other player made an illegal move: %s.", other_move['reason'])
 				elif other_move['move'] == 'timed_out':
-					info("The other player timed out.")
+					debug("The other player timed out.")
 				else:
 					error("The other player did something unknown!")
 
@@ -136,13 +151,15 @@ class RackO(object):
 
 			move = args['move']
 			if move == 'next_player_turn':
-				info("We moved successfully")
+				debug("We moved successfully")
 				self._push_discard(self.rack[self.idx])
 				self.rack[self.idx] = self.card
 			elif move == 'move_ended_game':
-				info("The game is over: %s", args['reason'])
+				debug("The game is over: %s", args['reason'])
 			elif move == 'illegal':
-				info("We made an illegal move: %s", args['reason'])
+				debug("We made an illegal move: %s", args['reason'])
+			elif move == 'timed_out':
+				error("We timed out.")
 			else:
 				error("We did something unexpected.")
 
@@ -157,13 +174,13 @@ class RackO(object):
 			if args['game_id'] != self.game_id:
 				error("Got a request for a move in non-active game.")
 
-			info("The game is over: %d - %d because %s", args['your_score'], args['other_score'], args['reason'])
+			info("The game is over after %d moves: %d - %d because %s", self.moves, args['your_score'], args['other_score'], args['reason'])
 
 			return ""
 		except Exception:
 			exception("")
 			raise
 
-server = SimpleXMLRPCServer(LISTEN)
+server = SimpleXMLRPCServer(LISTEN, logRequests=False)
 server.register_instance(RackO())
 server.serve_forever()
