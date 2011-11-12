@@ -174,21 +174,21 @@ class Knowledge(object):
         with open(fileName, 'w') as file:
             pickle.dump(self, file)
 
-def test_main():
-    rack = [0]*kRackSize
-    for i in range(0, kRackSize):
-        rack[i] = random.randint(1, kCardCount)
-    args = dict()
-    args['game_id'] = 1243
-    args['player_id'] = 0
-    args['other_player_id'] = 1
-    args['initial_discard'] = 3
-    kb = Knowledge(args)
-    kb.find_impossibilities_and_happiness(rack)
-    print "Rack: " + str(rack)
-    print "Happiness: " + str(kb.happiness)
-    print "Impossibilities: " + str(kb.impossibilities)
-    print "Probability to pull a 5: " + str(kb.probabilityToDraw(5))
- 
-if __name__ == '__main__':
-    test_main()
+#def test_main():
+#    rack = [0]*kRackSize
+#    for i in range(0, kRackSize):
+#        rack[i] = random.randint(1, kCardCount)
+#    args = dict()
+#    args['game_id'] = 1243
+#    args['player_id'] = 0
+#    args['other_player_id'] = 1
+#    args['initial_discard'] = 3
+#    kb = Knowledge(args)
+#    kb.find_impossibilities_and_happiness(rack)
+#    print "Rack: " + str(rack)
+#    print "Happiness: " + str(kb.happiness)
+#    print "Impossibilities: " + str(kb.impossibilities)
+#    print "Probability to pull a 5: " + str(kb.probabilityToDraw(5))
+# 
+#if __name__ == '__main__':
+#    test_main()

@@ -54,6 +54,10 @@ class orderingAgent(Agent):
         top_card = self.knowledge.discard_pile[-1]
         if top_card in good_cards:
             return False
+        elif(self.knowledge.happiness[self.knowledge.getIdealSlot(top_card)] < 
+             algorithms.getHappiness(top_card, self.knowledge.getIdealSlot(top_card)) or
+             self.knowledge.impossibilities[self.knowledge.getIdealSlot(top_card)]):
+            return False
         else:
             return True
         #else:
@@ -61,10 +65,7 @@ class orderingAgent(Agent):
     
     def place_card(self, card):
         #info(card/80.0, int(card/80.0 * 20))
-        rack = self.knowledge.rack
-        
-        
-        
+        rack = self.knowledge.rack 
         if(algorithms.adjacent_inversions(rack) == 0):
             #group cards.
             runs = [x for x in [j for j in  self.knowledge.rackContainsRuns(rack)]]
