@@ -1,3 +1,5 @@
+from __future__ import division
+
 from SimpleXMLRPCServer import SimpleXMLRPCServer
 
 import logging
@@ -121,7 +123,7 @@ class RackO(object):
 
 		self.k.pickle()
 
-		info("The game is over after %d moves: %d - %d because %s", self.k.moves, args['your_score'], args['other_score'], args['reason'])
+		info("The game is over after %d moves: %d - %d because %s", len(self.k.moves)/2, args['your_score'], args['other_score'], args['reason'])
 
 		self.game_id = None
 

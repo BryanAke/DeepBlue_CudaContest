@@ -160,7 +160,7 @@ class Knowledge(object):
     def pickle(self):
         fileName = os.path.join("pickledKnowledge", str(self.game_id) + "_" + str(self.other_player_id) + ".pickle")
         with open(fileName, 'w') as file:
-            pickle(self, file)
+            pickle.dump(self, file)
 
 # def test_main():
 #     rack = [0]*kRackSize
