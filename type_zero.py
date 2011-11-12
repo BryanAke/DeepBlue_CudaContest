@@ -124,6 +124,8 @@ class RackO(object):
 
 		info("The game is over after %d moves: %d - %d because %s", self.k.moves, args['your_score'], args['other_score'], args['reason'])
 
+		self.game_id = None
+
 		return ""
 
 server = SimpleXMLRPCServer(LISTEN, logRequests=False)
