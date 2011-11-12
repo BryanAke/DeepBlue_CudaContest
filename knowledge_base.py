@@ -1,16 +1,19 @@
+from __future__ import division
 import random
 
 ## constants
-kCardCount = 80.0
-kRackSize = 20.0
+kCardCount = 80
+kRackSize = 20
 
 ## the knowledge base which contains all of the knowledge
 ## which the player know in the game
 class Knowledge(object):
     ## initializes the knowledge base
     def __init__(self):
-        self.happiness = [0]*int(kRackSize)
-        self.impossibilities = [False]*int(kRackSize)
+        self.happiness = [0]*kRackSize
+        self.impossibilities = [False]*kRackSize
+        self.discard_pile = []
+        self.deck = set()
        
     ## populates the boolean list of impossibilities 
     def find_impossibilities_and_happiness(self, rack):
@@ -19,14 +22,12 @@ class Knowledge(object):
                 self.impossibilities[i] = True
             else:
                 self.impossibilities[i] = False
-            ##print "value: " + str(rack[i]/kCardCount)
-            ##print "place: " + str(i+1/kRackSize)
             self.happiness[i] = 1.0 - abs(((rack[i]/kCardCount) - ((i+1)/kRackSize)))
             
 def test_main():
-    rack = [0]*int(kRackSize)
+    rack = [0]*kRackSize
     for i in range(0, kRackSize):
-        rack[i] = random.randint(1, int(kCardCount))
+        rack[i] = random.randint(1, kCardCount)
     kb = Knowledge()
     kb.find_impossibilities_and_happiness(rack)
     print "Rack: " + str(rack)
