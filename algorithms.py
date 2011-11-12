@@ -3,15 +3,18 @@ import knowledge_base
 threshold = 10
 def adjacent_inversions(rack, idx=None, card=None):
 	order = 0;
+	temp = None
+	if idx != None:
+		temp = rack[idx]
+		rack[idx] = card
+	
 	for i in xrange(len(rack)-1):
-		if idx == i:
-			if card > rack[i + 1]:
-				order += 1
-		elif idx == i + 1:
-			if rack[i] > card:
-				order += 1
-		elif rack[i] > rack[i+1]:
+		if rack[i] > rack[i+1]:
 			order+=1
+			
+	if idx != None:
+		rack[idx]= temp
+		
 	return order
 
 def closest_indecies(rack):

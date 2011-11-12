@@ -128,7 +128,8 @@ class RackO(object):
             error("Got a request for a move in non-active game.")
 
         move = args['move']
-        self.k.our_move(move, self.should_draw, self.idx, self.card)
+        if args['move'] == 'move_ended_game' or args['move'] == 'next_player_turn':
+            self.k.our_move(move, self.should_draw, self.idx, self.card)
 
         if move == 'next_player_turn':
             debug("We moved successfully")
