@@ -192,11 +192,11 @@ class Knowledge(object):
             if self.rack[i] == self.rack[i-1]+1:
                 stop = i+1
             else:
-                if start != stop:
+                if (stop - start) > 1:
                     self.runs.append((self.rack[start], self.rack[stop-1], start, stop))
                 start = i
                 stop = i + 1
-        if start != stop:
+        if (stop - start) > 1:
             self.runs.append((self.rack[start], self.rack[stop-1], start, stop))
 
         def run_weight(r):
@@ -219,7 +219,7 @@ class Knowledge(object):
 
 
         return importantCards
-    
+
     def findRunIdx(self, card):
         adjNums = self.getNumsAdjacentToRuns()
         for tu in adjNums:
@@ -274,18 +274,18 @@ class Knowledge(object):
             return 0.0
         removedCards = kCardCount - kRackSize - len(self.discard_pile)
         return 1/removedCards
-    
+
     def isInRun(self, card):
         for run in self.runs:
             if(run[0] <= card <= run[1]):
                 return True
         return False
-    
+
     def getRun(self, card):
         for run in self.runs:
             if(run[0] <= card <= run[1]):
                 return run
-    
+
     def speculateSorted(self, card):
         sortedness = algorithms.adjacent_inversions(self.rack)
         sorted_idx = -1
