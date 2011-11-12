@@ -1,5 +1,7 @@
 from __future__ import division
 import random
+import pickle
+import os
 
 ## constants
 kCardCount = 80
@@ -50,6 +52,11 @@ class Knowledge(object):
             importantCards.add(run[0] - 1)
             importantCards.add(run[-1] + 1)
         return importantCards
+    
+    def pickle(self):
+        fileName = os.path.join("pickledKnowledge", self.game_id + "__" + self.other_player_id + ".pickle")
+        with open(fileName, 'w') as file:
+            pickle(self, file)
         
             
 def test_main():
