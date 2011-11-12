@@ -111,6 +111,7 @@ class Knowledge(object):
             error("We did something unexpected.")
 
         self.update_impossibilites_and_happiness_at_idx(idx)
+		info(algorithms.adjacent_inversions
 
     def final(self, us, them, reason):
         self.our_score = us
