@@ -1,3 +1,4 @@
+threshold = 10
 def adjacent_inversions(rack):
 	order = 0;
 	for i in xrange(len(rack)-1):
@@ -17,5 +18,16 @@ def closest_indecies(rack):
 	return ret
 
 
-#deterine how ordered the list is 
+#deterine whether to use the 'normal' distibution to model 
+#(which uses the happiness function) or whether to use the
+#'relative' distribution model (which fits places cards based
+#on their best relative location
+def normal_or_relative(rack):
+	#0: use normal distibution
+	#1: use relative distribution
+	if adjacent_inversions(rack) < threshold:
+		#then the rack is pretty sorted
+		return 1
+	return 0
 
+		
