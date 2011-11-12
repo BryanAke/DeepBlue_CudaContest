@@ -1,4 +1,7 @@
 from __future__ import division
+
+from logging import debug, info, warning, error, exception, critical
+
 import random
 import pickle
 import os
@@ -7,17 +10,118 @@ import os
 kCardCount = 80
 kRackSize = 20
 
+#thresholds
+kVeryUnhappy = .4
+kUnhappy = .6
+kOk = .8
+kHappy = .9
+kVeryHappy = 1.0
+
 ## the knowledge base which contains all of the knowledge
 ## which the player know in the game
 class Knowledge(object):
     ## initializes the knowledge base
-    def __init__(self):
+    def __init__(self, args):
         self.happiness = [0]*kRackSize
         self.impossibilities = [False]*kRackSize
         self.discard_pile = []
-        self.deck = set()
-       
-    ## populates the boolean list of impossibilities 
+        self.deck = set(xrange(1,kCardCount + 1))
+        self.deck_size = kCardCount - 2 * kRackSize - 1
+
+		self.game_id = args['game_id']
+		self.player_id = args['player_id']
+		self.other_player_id = args['other_player_id']
+		self.other_rack = [None] * kRackSize
+
+		self.orig_discard = args['initial_discard']
+		self.orig_rack = []
+		self.moves = []
+
+		self.push_discard(args['initial_discard'])
+
+		self.time = int(1e6)
+
+	def push_discard(self, card):
+		debug("Added %d to the discard pile", card)
+		self.discard.append(card)
+		self.deck.discard(card)
+
+	def pop_discard(self):
+		card = self.discard.pop()
+		debug("Took %d from the discard pile", card)
+		return card
+
+	def peek_discard(self):
+		return self.discard[-1]
+
+	def time(self, time):
+		self.time = time
+
+	def set_initial_rack(self, rack):
+		self.orig_rack = rack
+		self.deck.difference_update(rack)
+
+	def their_move(self, move, discard):
+		if move['move'] == 'take_discard':
+			card = self.pop_discard()
+			self.other_rack[move['idx']] = card
+			debug("The other player took %d and put it in slot %d.", card, other_move['idx'])
+			self.moves.append([False, False, move['idx']])
+		elif move['move'] == 'take_deck':
+			self.other_rack[move['idx']] = 0
+			self.draw()
+			self.moves.append([False, True, move['idx']])
+			debug("The other player drew and put it in slot %d.", other_move['idx'])
+		elif move['move'] == 'no_move':
+			debug("The other player made no move.")
+		elif move['move'] == 'illegal':
+			debug("The other player made an illegal move: %s.", other_move['reason'])
+		elif move['move'] == 'timed_out':
+			debug("The other player timed out.")
+		else:
+			error("The other player did something unknown!")
+
+		self.push_discard(discard)
+
+	def our_move(self, move, drew, idx, card):
+		if move == 'next_player_turn':
+			debug("We moved successfully")
+			if self.drew:
+				self.draw()
+				self.deck.discard(card)
+			else:
+				self.pop_discard()
+			self.push_discard(self.rack[idx])
+			self.rack[idx] = card
+		elif move == 'move_ended_game':
+			debug("The game is over: %s", args['reason'])
+			if self.drew:
+				self.draw()
+				self.deck.discard(card)
+			else:
+				self.pop_discard()
+			self.push_discard(self.rack[idx])
+			self.rack[idx] = card
+		elif move == 'illegal':
+			error("We made an illegal move: %s", args['reason'])
+		elif move == 'timed_out':
+			error("We timed out.")
+		else:
+			error("We did something unexpected.")
+
+	def final(self, us, them, reason):
+		self.our_score = us
+		self.their_schore = them
+		self.finish_criterion = reason
+
+	def draw(self):
+		self.deck_size -= 1
+		if self.deck_size == 0:
+			self.deck = set(self.discard[:-1])
+			self.deck_size = len(self.deck)
+			self.discard = [self.discard[-1]]
+
+    ## populates the boolean list of impossibilities
     def find_impossibilities_and_happiness(self, rack):
         for i in range(0, len(rack)):
             if (kCardCount - rack[i] < kRackSize - i or i + 1 > rack[i]):
@@ -25,11 +129,11 @@ class Knowledge(object):
             else:
                 self.impossibilities[i] = False
             self.happiness[i] = 1.0 - abs(((rack[i]/kCardCount) - ((i+1)/kRackSize)))
-            
+
     def rackContains(self, rack, val):
         idx = rack.index(val)
         return (idx != -1) and not self.impossibilities[idx]
-    
+
     def rackContainsAdjacent(self, rack, val):
         return self.rackContains(rack, val + 1) or self.rackContains(rack, val - 1)
 
@@ -44,7 +148,7 @@ class Knowledge(object):
                 ret.append(tuple(run))
                 run = [i]
         return [i for i in ret if len(i) > 1]
-    
+
     def getNumsAdjacentToRuns(self, rack):
         runs = self.rackContainsRuns(rack)
         importantCards = set()
@@ -52,13 +156,12 @@ class Knowledge(object):
             importantCards.add(run[0] - 1)
             importantCards.add(run[-1] + 1)
         return importantCards
-    
+
     def pickle(self):
         fileName = os.path.join("pickledKnowledge", self.game_id + "__" + self.other_player_id + ".pickle")
         with open(fileName, 'w') as file:
             pickle(self, file)
-        
-            
+
 def test_main():
     rack = [0]*kRackSize
     for i in range(0, kRackSize):
@@ -68,5 +171,5 @@ def test_main():
     print "Rack: " + str(rack)
     print "Happiness: " + str(kb.happiness)
     print "Impossibilities: " + str(kb.impossibilities)
-    
+
 test_main()
