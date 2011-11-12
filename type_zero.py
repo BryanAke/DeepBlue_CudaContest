@@ -76,6 +76,20 @@ class RackO(object):
 		if args['other_player_moves']:
 			self.k.their_move(args['other_player_moves'][0][1], args['discard'])
 
+			if move['move'] == 'take_discard':
+				debug("The other player took %d and put it in slot %d.", card, move['idx'])
+			elif move['move'] == 'take_deck':
+				debug("The other player drew and put it in slot %d.", move['idx'])
+			elif move['move'] == 'no_move':
+				debug("The other player made no move.")
+			elif move['move'] == 'illegal':
+				debug("The other player made an illegal move: %s.", move['reason'])
+			elif move['move'] == 'timed_out':
+				debug("The other player timed out.")
+			else:
+				error("The other player did something unknown!")
+
+
 		our_move = { }
 
 		self.should_draw = self.a.should_draw()
@@ -111,8 +125,16 @@ class RackO(object):
 		move = args['move']
 		self.k.our_move(move, self.should_draw, self.idx, self.card)
 
-		if args['move'] == 'move_ended_game':
+		if move == 'next_player_turn':
+            debug("We moved successfully")
+        elif args['move'] == 'move_ended_game':
 			debug("The game is over: %s", args['reason'])
+		elif move == 'illegal':
+            error("We made an illegal move: %s", args['reason'])
+        elif move == 'timed_out':
+            error("We timed out.")
+        else:
+            error("We did something unexpected.")
 
 		return ""
 
