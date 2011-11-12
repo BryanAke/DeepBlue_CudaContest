@@ -45,7 +45,7 @@ def best_fit(card, rack):
 		for tup in runs:
 			if card in tup:
 				return rack.index(card)
-			elif True in knowledge.impossibilities and rack.index(True)			
+			elif True in knowledge.impossibilities and rack.index(True):		
 				print "Holder 2"
 				
 
