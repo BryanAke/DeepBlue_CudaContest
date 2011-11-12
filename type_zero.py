@@ -54,7 +54,7 @@ class RackO(object):
 		self.game_id = args['game_id']
 
 		self.k = knowledge_base.Knowledge(args)
-		self.a = agent.Agent(self.k)
+		self.a = agent.orderingAgent(self.k)
 
 		info("Starting game %d going %s against team %d.", args['game_id'], ("first", "second")[args['player_id']], args['other_player_id'])
 
