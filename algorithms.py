@@ -59,6 +59,20 @@ def closestValidFit(card,rack):
 		return (i-1)
 	return 0
 
+def getScore(rack,card):
+	score = 0
+	for i in xrange(len(rack)-1):
+		if rack[i+1]:
+			if rack[i]<rack[i+1]:
+				score = score+1
+	return score
+
+
+
+
+
+
+
 
 def getHappiness(card, index):
 	return 1.0 - abs(((card/knowledge_base.kCardCount) - ((index+1)/knowledge_base.kRackSize)))
