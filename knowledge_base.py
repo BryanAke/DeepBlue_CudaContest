@@ -65,21 +65,11 @@ class Knowledge(object):
         if move['move'] == 'take_discard':
             card = self.pop_discard()
             self.other_rack[move['idx']] = card
-            debug("The other player took %d and put it in slot %d.", card, move['idx'])
             self.moves.append([False, False, move['idx'], card])
         elif move['move'] == 'take_deck':
             self.other_rack[move['idx']] = 0
             self.draw()
             self.moves.append([False, True, move['idx'], 0])
-            debug("The other player drew and put it in slot %d.", move['idx'])
-        elif move['move'] == 'no_move':
-            debug("The other player made no move.")
-        elif move['move'] == 'illegal':
-            debug("The other player made an illegal move: %s.", move['reason'])
-        elif move['move'] == 'timed_out':
-            debug("The other player timed out.")
-        else:
-            error("The other player did something unknown!")
 
         self.push_discard(discard)
 
@@ -103,12 +93,6 @@ class Knowledge(object):
                 self.pop_discard()
             self.push_discard(self.rack[idx])
             self.rack[idx] = card
-        elif move == 'illegal':
-            error("We made an illegal move: %s", args['reason'])
-        elif move == 'timed_out':
-            error("We timed out.")
-        else:
-            error("We did something unexpected.")
 
         self.update_impossibilites_and_happiness_at_idx(idx)
 
