@@ -39,9 +39,17 @@ class Knowledge(object):
             if not run or i is run[-1] :
                 run.append(i)
             else:
-                ret.append(run)
+                ret.append(tuple(run))
                 run = [i]
         return [i for i in ret if len(i) > 1]
+    
+    def getNumsAdjacentToRuns(self, rack):
+        runs = self.rackContainsRuns(rack)
+        importantCards = set()
+        for run in runs:
+            importantCards.add(run[0] - 1)
+            importantCards.add(run[-1] + 1)
+        return importantCards
             
 def test_main():
     rack = [0]*kRackSize
