@@ -16,7 +16,7 @@ class Agent(object):
             ## greedily find ordered index (least)
             orderedIndex = closestValidFit(topCard, self.knowledge.rack)
             ## check happiness at that index
-            happy = 1.0 - abs(((topCard/kCardCount) - ((orderedIndex+1)/kRackSize)))
+            happy = getHappiness(topCard, orderedIndex)
             ## check if happy is greater than threshhold
             if(happy > kOk):
                 return False
@@ -26,4 +26,4 @@ class Agent(object):
             return True
 
     def place_card(self, card):
-        return random.randint(0, 19)
+        return closestValidFit(card, self.knowledge.rack)
