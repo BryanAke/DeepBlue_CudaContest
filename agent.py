@@ -11,7 +11,7 @@ class Agent(object):
         ## get the top of the discard pile
         topCard = -1
         if(len(self.knowledge.discard_pile) > 0):
-            topCard = self.knowledge.discard_pile[0]
+            topCard = self.knowledge.peek_discard()
         if(topCard >= 0):
             ## primary check if it is directly adjacent
             if(topCard in self.knowledge.getNumsAdjacentToRuns()):
@@ -44,11 +44,11 @@ class Agent(object):
                 elif(card - self.knowledge.rack[i] == 1):
                     return i + 1
         return algorithms.closestValidFit(card, self.knowledge.rack)
-    
+
 class orderingAgent(Agent):
     def shouldDraw(self):
         return False
-    
+
     def place_card(self, card):
         highest_wgo = 0
         highest_idx = 0
@@ -58,4 +58,4 @@ class orderingAgent(Agent):
                 highest_wgo = rack[i]
                 highest_idx = i
         return i + 1
-    
+
