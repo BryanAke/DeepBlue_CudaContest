@@ -1,3 +1,5 @@
+import knowledge_base
+
 threshold = 10
 def adjacent_inversions(rack):
 	order = 0;

@@ -13,12 +13,15 @@ class Agent(object):
         if(len(self.knowledge.discard_pile) > 0):
             topCard = self.knowledge.discard_pile[0]
         if(topCard >= 0):
+            ## primary check if it is directly adjacent
+            if(topCard in self.knowledge.getNumsAdjacentToRuns()):
+                return True
             ## greedily find ordered index (least)
             orderedIndex = algorithms.closestValidFit(topCard, self.knowledge.rack)
             ## check happiness at that index
             happy = algorithms.getHappiness(topCard, orderedIndex)
             ## check if happy is greater than threshhold
-            if(happy > knowledge_base.kOk and happy > knowledge_base.happiness[orderedIndex]):
+            if(happy > knowledge_base.kOk and happy > self.knowledge.happiness[orderedIndex]):
                 return False
             else:
                 return True
@@ -26,4 +29,10 @@ class Agent(object):
             return True
 
     def place_card(self, card):
+        if(card in self.knowledge.getNumsAdjacentToRuns()):
+            for i in range(0, len(self.knowledge.rack)-1):
+                if(self.knowledge.rack[i] - card == 1):
+                    return i - 1
+                elif(card - self.knowledge.rack[i] == 1):
+                    return i + 1
         return algorithms.closestValidFit(card, self.knowledge.rack)

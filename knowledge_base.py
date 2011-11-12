@@ -66,11 +66,11 @@ class Knowledge(object):
             card = self.pop_discard()
             self.other_rack[move['idx']] = card
             debug("The other player took %d and put it in slot %d.", card, move['idx'])
-            self.moves.append([False, False, move['idx']])
+            self.moves.append([False, False, move['idx'], card])
         elif move['move'] == 'take_deck':
             self.other_rack[move['idx']] = 0
             self.draw()
-            self.moves.append([False, True, move['idx']])
+            self.moves.append([False, True, move['idx'], 0])
             debug("The other player drew and put it in slot %d.", move['idx'])
         elif move['move'] == 'no_move':
             debug("The other player made no move.")
@@ -85,6 +85,7 @@ class Knowledge(object):
 
     def our_move(self, move, drew, idx, card):
         if move == 'next_player_turn':
+            self.moves.append([True, drew, idx, card])
             debug("We moved successfully")
             if drew:
                 self.draw()
@@ -94,6 +95,7 @@ class Knowledge(object):
             self.push_discard(self.rack[idx])
             self.rack[idx] = card
         elif move == 'move_ended_game':
+            self.moves.append([True, drew, idx, card])
             debug("The game is over: %s", args['reason'])
             if drew:
                 self.draw()
@@ -149,12 +151,17 @@ class Knowledge(object):
                 run = [i]
         return [i for i in ret if len(i) > 1]
 
-    def getNumsAdjacentToRuns(self, rack):
-        runs = self.rackContainsRuns(rack)
+    def getNumsAdjacentToRuns(self):
+        runs = self.rackContainsRuns(self.rack)
         importantCards = set()
         for run in runs:
             importantCards.add(run[0] - 1)
             importantCards.add(run[-1] + 1)
+        
+        #possible edge cases
+        importantCards.discard(0)
+        importantCards.discard(81)
+            
         return importantCards
 
     def pickle(self):
