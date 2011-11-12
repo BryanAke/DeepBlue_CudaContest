@@ -111,6 +111,8 @@ class Knowledge(object):
         else:
             error("We did something unexpected.")
 
+        self.update_impossibilites_and_happiness_at_idx(idx)
+
     def final(self, us, them, reason):
         self.our_score = us
         self.their_schore = them
@@ -137,8 +139,8 @@ class Knowledge(object):
             self.impossibilities[idx] = True
         else:
             self.impossibilities[idx] = False
-        self.happiness[idx] = 1.0 - abs(((rack[idx]/kCardCount) - ((idx+1)/kRackSize)))
-        
+        self.happiness[idx] = 1.0 - abs(((self.rack[idx]/kCardCount) - ((idx+1)/kRackSize)))
+
     def rackContains(self, rack, val):
         idx = rack.index(val)
         return (idx != -1) and not self.impossibilities[idx]
@@ -164,11 +166,11 @@ class Knowledge(object):
         for run in runs:
             importantCards.add(run[0] - 1)
             importantCards.add(run[-1] + 1)
-        
+
         #possible edge cases
         importantCards.discard(0)
         importantCards.discard(81)
-            
+
         return importantCards
 
     def pickle(self):
