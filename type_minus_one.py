@@ -2,6 +2,8 @@ from SimpleXMLRPCServer import SimpleXMLRPCServer
 
 import random
 import socket
+import traceback
+import functools
 
 # This is a hack to patch slow socket.getfqdn calls that
 # BaseHTTPServer (and its subclasses) make.
@@ -14,8 +16,7 @@ def _bare_address_string(self):
     host, port = self.client_address[:2]
     return '%s' % host
 
-BaseHTTPServer.BaseHTTPRequestHandler.address_string = \
-        _bare_address_string
+BaseHTTPServer.BaseHTTPRequestHandler.address_string = _bare_address_string
 
 # End hack.
 
@@ -23,20 +24,36 @@ BaseHTTPServer.BaseHTTPRequestHandler.address_string = \
 
 LISTEN = ('0.0.0.0', 1337)
 
+def trycatch(f):
+	@functools.wraps(f)
+	def fw(*args, **kwargs):
+		try:
+			return f(*args, **kwargs)
+		except Exception:
+			traceback.print_exc()
+			raise
+	return fw
+
 class RackO(object):
+	@trycatch
 	def ping(self, p):
 		return "pong"
 
+	@trycatch
 	def start_game(self, args):
 		return ""
 
+	@trycatch
 	def get_move(self, args):
 		#print "{:7d}".format(args['remaining_microseconds'])
+		print args['remaining_microseconds']
 		return { 'move' : 'request_deck' }
 
+	@trycatch
 	def get_deck_exchange(self, args):
 		return random.randint(0, 19)
 
+	@trycatch
 	def move_result(self, args):
 		if args['move'] == 'illegal':
 			print("We made an illegal move: %s", args['reason'])
@@ -45,9 +62,10 @@ class RackO(object):
 
 		return ""
 
+	@trycatch
 	def game_result(self, args):
 
-		print("The game is over after %d moves: %d - %d because %s" % (self.moves, args['your_score'], args['other_score'], args['reason']))
+		print "The game is over: %d - %d because %s" % (args['your_score'], args['other_score'], args['reason'])
 
 		return ""
 
