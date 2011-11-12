@@ -50,7 +50,7 @@ def best_fit(card, rack):
 def closestValidFit(card,rack):
 	#return index of location that best fits
 	for i in xrange(len(rack)-1):
-		if card < rack[i]:
+		if card > rack[i]:
 			continue
 		if i==0:
 			return i
