@@ -111,6 +111,9 @@ class RackO(object):
 		move = args['move']
 		self.k.our_move(move, self.should_draw, self.idx, self.card)
 
+		if args['move'] == 'move_ended_game':
+			debug("The game is over: %s", args['reason'])
+
 		return ""
 
 	@trycatch

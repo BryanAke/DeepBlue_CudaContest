@@ -96,7 +96,6 @@ class Knowledge(object):
             self.rack[idx] = card
         elif move == 'move_ended_game':
             self.moves.append([True, drew, idx, card])
-            debug("The game is over: %s", args['reason'])
             if drew:
                 self.draw()
                 self.deck.discard(card)
