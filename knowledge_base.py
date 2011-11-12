@@ -154,6 +154,38 @@ class Knowledge(object):
                 run = [i]
         return [i for i in ret if len(i) > 1]
 
+    def checkDiscard(self, num):
+        for elem in self.discard_pile:
+            if num is elem:
+                return True
+        for elem in self.other_rack:
+            if num is elem:
+                return True
+        return False
+
+    #find out whether 5 card run is possible to create
+    def getRunCompletion(self, run):
+        ascend = range(run[1]+1,run[0]+5)[:len(self.rack)-run[3]]
+        decend = range(run[0]-1,run[1]-5,-1)[:run[2]]
+        a = run[3]-run[2]
+        d = run[3]-run[2]
+        if (run[0]+5) <= 80:
+            for num in ascend:
+                if self.checkDiscard(num):
+                    break
+                else:
+                    a += 1
+        if (run[1]-5) >=1:
+            for num in decend:
+                if self.checkDiscard(num):
+                    break
+                else:
+                    d += 1
+        if a < 5 and d < 5:
+            a,d = 0,0
+        res = (a,d)
+        return res
+
     def update_runs(self):
         self.runs = []
         start = 0
@@ -171,13 +203,12 @@ class Knowledge(object):
 
         def run_weight(r):
             w = (r[3]-r[2]) * algorithms.getHappiness((r[0]+r[1])/2, (r[2]+r[3]-1)/2)
-            if r[0] in self.deck and r[1] in self.deck:
-                w *= 2
-            if r[0] not in self.deck and r[1] not in self.deck:
-                w *= 0
+            w *= sum(getRunCompletion(r))
             return w
 
         self.runs.sort(key=run_weight, reverse=True)
+
+        # When runs are out-of-order
 
         while self.runs and run_weight(self.runs[-1]) == 0:
             self.runs.pop()
@@ -193,13 +224,13 @@ class Knowledge(object):
         importantCards.discard(81)
 
         return importantCards
-    
+
     ## returns the probabilty of drawing a card from the deck
     def probabilityToDraw(self, card):
         if (card in self.discard_pile and card != peak_discard()):
             return 0.0
-        removedCards = kCardCount - kRackSize - len(self.discard_pile) 
-        return 1/removedCards  
+        removedCards = kCardCount - kRackSize - len(self.discard_pile)
+        return 1/removedCards
 
     def pickle(self):
         fileName = os.path.join("pickledKnowledge", str(self.game_id) + "_" + str(self.other_player_id) + ".pickle")
@@ -221,6 +252,6 @@ def test_main():
     print "Happiness: " + str(kb.happiness)
     print "Impossibilities: " + str(kb.impossibilities)
     print "Probability to pull a 5: " + str(kb.probabilityToDraw(5))
- 
+
 if __name__ == '__main__':
     test_main()
