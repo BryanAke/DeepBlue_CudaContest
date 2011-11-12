@@ -29,7 +29,7 @@ BaseHTTPServer.BaseHTTPRequestHandler.address_string = _bare_address_string
 
 # End hack.
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 
 def trycatch(f):
     @functools.wraps(f)
@@ -118,6 +118,7 @@ class RackO(object):
         self.card = args['card']
         self.idx = self.a.place_card(self.card)
 
+        debug("get_deck_exchange -> %s", repr(self.idx))
         return self.idx
 
     @trycatch

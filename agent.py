@@ -102,13 +102,13 @@ class orderingAgent(Agent):
                 if r[2] <= currentSpot < r[3]:
                     # This card collides with a run in the Ideal slot
                     if card < r[0]:
-                        if r[0] != 0:
+                        if r[2] != 0:
                             newSpot = r[2] - 1
                             delta = +1
                             break
                         else:
                             return 0
-                    if car > r[3]:
+                    if card > r[3]:
                         if r[3] != len(rack):
                             newSpot = r[3]
                             delta = -1
@@ -126,6 +126,11 @@ class orderingAgent(Agent):
                         currentSpot += 1
                     else:
                         currentSpot -= 1
+
+                if currentSpot == -1:
+                    currentSpot = 0
+                if currentSpot == 20:
+                    currentSpot = 19
 
                 return currentSpot
 

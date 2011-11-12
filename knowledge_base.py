@@ -165,22 +165,20 @@ class Knowledge(object):
 
     #find out whether 5 card run is possible to create
     def getRunCompletion(self, run):
-        ascend = range(run[1]+1,run[0]+5)[:len(self.rack)-run[3]]
-        decend = range(run[0]-1,run[1]-5,-1)[:run[2]]
+        ascend = range(min(run[1]+1,80),min(run[0]+5,80))[:len(self.rack)-run[3]]
+        decend = range(max(run[0]-1,1),max(run[1]-5,1),-1)[:run[2]]
         a = run[3]-run[2]
         d = run[3]-run[2]
-        if (run[0]+5) <= 80:
-            for num in ascend:
-                if self.checkDiscard(num):
-                    break
-                else:
-                    a += 1
-        if (run[1]-5) >=1:
-            for num in decend:
-                if self.checkDiscard(num):
-                    break
-                else:
-                    d += 1
+        for num in ascend:
+            if self.checkDiscard(num):
+                break
+            else:
+                a += 1
+        for num in decend:
+            if self.checkDiscard(num):
+                break
+            else:
+                d += 1
         if a < 5 and d < 5:
             a,d = 0,0
         res = (a,d)
@@ -203,7 +201,7 @@ class Knowledge(object):
 
         def run_weight(r):
             w = (r[3]-r[2]) * algorithms.getHappiness((r[0]+r[1])/2, (r[2]+r[3]-1)/2)
-            w *= sum(getRunCompletion(r))
+            w *= sum(self.getRunCompletion(r))
             return w
 
         self.runs.sort(key=run_weight, reverse=True)
